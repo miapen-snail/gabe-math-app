@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MATH MISSION — Hologram HUD v2b</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,10 +20,8 @@
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background:
                 radial-gradient(1px 1px at 5% 8%, white, transparent),
                 radial-gradient(1px 1px at 12% 15%, white, transparent),
@@ -51,12 +45,12 @@
                 radial-gradient(1px 1px at 42% 42%, white, transparent),
                 radial-gradient(ellipse at 20% 60%, rgba(80,0,200,.15) 0%, transparent 55%),
                 radial-gradient(ellipse at 80% 30%, rgba(0,80,200,.12) 0%, transparent 55%);
-            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            background-size: 100% 100%;
             background-attachment: fixed;
             pointer-events: none;
             z-index: 1;
         }
- 
+
         .container {
             max-width: 480px;
             margin: 0 auto;
@@ -75,16 +69,12 @@
             overflow-y: auto;
             animation: fadeIn 0.6s ease;
         }
-
         .screen.active {
             display: flex;
             flex-direction: column;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* HOLOGRAPHIC ANIMATIONS */
         @keyframes holo-pulse {
@@ -98,21 +88,20 @@
             }
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes scanlines {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(4px); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-8px); }
         }
 
-        /* HOLOGRAPHIC CARD STYLE */
+        /* BUG-10 FIX: shimmer that doesn't override width */
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.85; }
+            50%       { opacity: 1; }
+        }
+
+        /* HOLOGRAPHIC CARD */
         .card {
             background: rgba(0,128,255,.06);
             border: 1px solid rgba(0,255,255,.35);
@@ -122,12 +111,10 @@
             margin-bottom: 12px;
             animation: holo-pulse 3s ease infinite;
         }
-
         .card.green-accent {
             border-color: rgba(0,255,100,.4);
             box-shadow: 0 0 12px rgba(0,255,100,.2), inset 0 0 8px rgba(0,255,100,.08);
         }
-
         .card.amber-accent {
             border-color: rgba(255,180,0,.4);
             box-shadow: 0 0 12px rgba(255,180,0,.2), inset 0 0 8px rgba(255,180,0,.08);
@@ -175,13 +162,11 @@
             animation: holo-pulse 3s ease infinite;
             text-transform: uppercase;
         }
-
         .btn:hover {
             background: rgba(0,128,255,.3);
             box-shadow: 0 0 20px rgba(0,255,255,.6);
             transform: scale(1.05);
         }
-
         .btn.primary {
             border-color: rgba(0,255,255,.6);
             background: rgba(0,200,255,.2);
@@ -191,17 +176,31 @@
             font-size: 16px;
             margin-top: 20px;
         }
-
         .btn.green {
             border-color: rgba(0,255,100,.5);
             background: rgba(0,200,100,.1);
             color: #00FF64;
         }
-
         .btn.amber {
             border-color: rgba(255,180,0,.5);
             background: rgba(255,180,0,.1);
             color: #FFB400;
+        }
+        /* BUG-15 FIX: back button style */
+        .btn.back {
+            border-color: rgba(0,255,255,.2);
+            background: transparent;
+            color: rgba(0,255,255,.45);
+            font-size: 12px;
+            padding: 7px 12px;
+            margin-bottom: 8px;
+            animation: none;
+        }
+        .btn.back:hover {
+            color: #00FFFF;
+            border-color: rgba(0,255,255,.5);
+            transform: none;
+            box-shadow: none;
         }
 
         /* INPUTS */
@@ -219,17 +218,15 @@
             outline: none;
             transition: border-color 0.3s;
         }
-
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="number"]:focus {
             border-bottom-color: rgba(0,255,255,.8);
             box-shadow: 0 0 10px rgba(0,255,255,.3);
         }
-
-        input::placeholder {
-            color: rgba(0,255,255,.4);
-        }
+        input::placeholder { color: rgba(0,255,255,.4); }
+        /* BUG-01 FIX: file inputs are hidden, triggered by zone click */
+        input[type="file"] { display: none; }
 
         /* UPLOAD ZONE */
         .upload-zone {
@@ -243,16 +240,20 @@
             animation: holo-pulse 4s ease infinite;
             margin-bottom: 12px;
         }
-
         .upload-zone:hover {
             border-color: rgba(0,255,255,.8);
             background: rgba(0,100,200,.15);
         }
-
         .upload-zone-label {
             font-size: 13px;
             color: rgba(0,255,255,.7);
             margin-top: 8px;
+        }
+        .upload-file-name {
+            font-size: 12px;
+            color: #00FF64;
+            margin-top: 6px;
+            min-height: 16px;
         }
 
         /* PROGRESS BAR */
@@ -265,20 +266,16 @@
             margin: 12px 0;
             border: 1px solid rgba(0,255,255,.2);
         }
-
+        /* BUG-10 FIX: shimmer does NOT change width — real width is preserved */
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #0080FF, #00FFFF);
-            animation: slide 2s ease infinite;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+            animation: shimmer 2s ease infinite;
         }
 
-        @keyframes slide {
-            0% { width: 0%; }
-            50% { width: 100%; }
-            100% { width: 0%; }
-        }
-
-        /* TITLE */
+        /* TYPOGRAPHY */
         h1 {
             font-size: 32px;
             font-weight: 700;
@@ -290,31 +287,9 @@
             background-clip: text;
             letter-spacing: 2px;
         }
-
-        h2 {
-            font-size: 20px;
-            font-weight: 600;
-            color: #00FFFF;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #00FFFF;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        p {
-            font-size: 13px;
-            color: rgba(0,255,255,.8);
-            line-height: 1.6;
-            margin-bottom: 8px;
-        }
+        h2 { font-size: 20px; font-weight: 600; color: #00FFFF; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        h3 { font-size: 14px; font-weight: 600; color: #00FFFF; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        p  { font-size: 13px; color: rgba(0,255,255,.8); line-height: 1.6; margin-bottom: 8px; }
 
         /* WELCOME SCREEN */
         .rocket-ring {
@@ -329,23 +304,11 @@
             animation: spin 8s linear infinite;
             font-size: 60px;
         }
-
-        .mission-stats {
-            text-align: center;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .mission-stats div {
-            color: rgba(0,255,255,.7);
-            margin-bottom: 4px;
-        }
+        .mission-stats { text-align: center; font-size: 13px; margin-bottom: 20px; }
+        .mission-stats div { color: rgba(0,255,255,.7); margin-bottom: 4px; }
 
         /* SETUP SCREEN */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
+        .form-group { margin-bottom: 16px; }
         .form-group label {
             display: block;
             font-size: 12px;
@@ -366,8 +329,8 @@
             justify-content: center;
             margin: 20px auto;
             animation: spin 4s linear infinite;
+            font-size: 32px; /* BUG-16 FIX: sized for emoji icon */
         }
-
         .scanning-text {
             text-align: center;
             font-size: 12px;
@@ -376,7 +339,6 @@
             letter-spacing: 1px;
             margin-bottom: 20px;
         }
-
         .threat-row {
             display: flex;
             align-items: center;
@@ -387,7 +349,6 @@
             margin-bottom: 8px;
             gap: 10px;
         }
-
         .threat-badge {
             background: rgba(200,0,0,.3);
             border: 1px solid rgba(200,0,0,.6);
@@ -399,7 +360,6 @@
             text-transform: uppercase;
             white-space: nowrap;
         }
-
         .toggle {
             width: 40px;
             height: 20px;
@@ -412,27 +372,13 @@
             padding: 2px;
             transition: all 0.3s;
             margin-left: auto;
+            flex-shrink: 0;
         }
+        .toggle.active { background: rgba(0,255,100,.3); border-color: rgba(0,255,100,.6); }
+        .toggle-dot { width: 16px; height: 16px; background: #00FFFF; border-radius: 50%; transition: transform 0.3s; }
+        .toggle.active .toggle-dot { transform: translateX(18px); background: #00FF64; }
 
-        .toggle.active {
-            background: rgba(0,255,100,.3);
-            border-color: rgba(0,255,100,.6);
-        }
-
-        .toggle-dot {
-            width: 16px;
-            height: 16px;
-            background: #00FFFF;
-            border-radius: 50%;
-            transition: transform 0.3s;
-        }
-
-        .toggle.active .toggle-dot {
-            transform: translateX(18px);
-            background: #00FF64;
-        }
-
-        /* PRACTICE SHEET SCREEN */
+        /* PRACTICE SHEET */
         .success-banner {
             background: rgba(0,200,100,.15);
             border: 1px solid rgba(0,255,100,.4);
@@ -445,7 +391,6 @@
             text-transform: uppercase;
             font-size: 12px;
         }
-
         .question-card {
             background: rgba(0,100,150,.08);
             border: 1px solid rgba(0,200,255,.3);
@@ -454,7 +399,6 @@
             margin-bottom: 16px;
             animation: holo-pulse 3s ease infinite;
         }
-
         .question-num {
             display: inline-flex;
             align-items: center;
@@ -468,14 +412,11 @@
             font-size: 16px;
             color: #00FFFF;
             margin-right: 10px;
+            flex-shrink: 0;
         }
+        .question-text { font-size: 14px; color: #FFFFFF; margin-bottom: 12px; }
 
-        .question-text {
-            font-size: 14px;
-            color: #FFFFFF;
-            margin-bottom: 12px;
-        }
-
+        /* BUG-02 FIX: calc-field is contenteditable */
         .calc-field {
             background: rgba(0,50,100,.1);
             border: 1px dashed rgba(0,255,255,.3);
@@ -484,7 +425,20 @@
             min-height: 60px;
             margin-bottom: 12px;
             font-size: 12px;
-            color: rgba(0,255,255,.5);
+            color: rgba(0,255,255,.85);
+            cursor: text;
+            outline: none;
+            line-height: 1.6;
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .calc-field:empty::before {
+            content: attr(data-placeholder);
+            color: rgba(0,255,255,.3);
+            pointer-events: none;
+        }
+        .calc-field:focus {
+            border-color: rgba(0,255,255,.6);
+            background: rgba(0,80,150,.15);
         }
 
         .answer-input {
@@ -498,10 +452,7 @@
             font-weight: 600;
             text-align: center;
         }
-
-        .answer-input::placeholder {
-            color: rgba(0,255,255,.3);
-        }
+        .answer-input::placeholder { color: rgba(0,255,255,.3); }
 
         .section-label {
             display: inline-block;
@@ -514,28 +465,14 @@
             margin-bottom: 8px;
             text-transform: uppercase;
         }
-
-        .action-section {
-            border-top: 1px solid rgba(0,255,255,.2);
-            padding-top: 16px;
-            margin-top: 16px;
-        }
-
-        .action-section.cyan {
-            border-top-color: rgba(0,255,255,.4);
-        }
+        .action-section { border-top: 1px solid rgba(0,255,255,.2); padding-top: 16px; margin-top: 16px; }
+        .action-section.cyan { border-top-color: rgba(0,255,255,.4); }
 
         /* REVIEW SCREEN */
-        .progress-dots {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 16px;
-        }
-
+        .progress-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
         .dot {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             border: 1px solid rgba(0,255,255,.3);
             background: rgba(0,100,150,.1);
@@ -545,14 +482,17 @@
             font-size: 11px;
             color: rgba(0,255,255,.5);
             transition: all 0.3s;
+            cursor: pointer;
         }
-
+        .dot:hover { border-color: rgba(0,255,255,.6); color: #00FFFF; }
         .dot.active {
             border-color: rgba(0,255,255,.8);
             background: rgba(0,200,255,.3);
             color: #00FFFF;
             box-shadow: 0 0 12px rgba(0,255,255,.4);
         }
+        .dot.passed  { border-color: rgba(0,255,100,.7);  background: rgba(0,200,100,.2);  color: #00FF64; }
+        .dot.retried { border-color: rgba(255,180,0,.7);  background: rgba(255,180,0,.15); color: #FFB400; }
 
         .objective-header {
             text-align: center;
@@ -562,7 +502,6 @@
             margin-bottom: 16px;
             letter-spacing: 1px;
         }
-
         .review-card {
             background: rgba(0,80,150,.08);
             border: 1px solid rgba(0,180,255,.3);
@@ -570,15 +509,7 @@
             padding: 16px;
             margin-bottom: 16px;
         }
-
-        .review-card h3 {
-            color: #00FFFF;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
+        .review-card h3 { color: #00FFFF; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .objective-badge {
             display: inline-flex;
             align-items: center;
@@ -591,13 +522,13 @@
             font-weight: bold;
             font-size: 18px;
             color: #00FFFF;
+            flex-shrink: 0;
         }
-
         .cadet-work-box {
             background: rgba(0,30,60,.3);
             border: 1px dashed rgba(0,150,200,.4);
             border-radius: 8px;
-            padding: 24px;
+            padding: 16px;
             text-align: center;
             color: rgba(0,255,255,.4);
             font-size: 13px;
@@ -607,7 +538,7 @@
             align-items: center;
             justify-content: center;
         }
-
+        .cadet-work-box img { max-width: 100%; max-height: 220px; border-radius: 6px; }
         .mission-result {
             background: rgba(200,0,0,.15);
             border: 1px solid rgba(200,0,0,.4);
@@ -615,19 +546,13 @@
             padding: 16px;
             text-align: center;
             margin-bottom: 12px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             color: #FF6B6B;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
-        .mission-result.success {
-            background: rgba(0,200,100,.15);
-            border-color: rgba(0,255,100,.4);
-            color: #00FF64;
-        }
-
+        .mission-result.success { background: rgba(0,200,100,.15); border-color: rgba(0,255,100,.4); color: #00FF64; }
         .solution-steps {
             background: rgba(0,100,150,.1);
             border: 1px solid rgba(0,200,255,.3);
@@ -637,7 +562,6 @@
             color: rgba(0,255,255,.8);
             line-height: 1.8;
         }
-
         .hint-panel {
             background: rgba(255,180,0,.08);
             border: 1px solid rgba(255,180,0,.3);
@@ -645,27 +569,13 @@
             padding: 12px;
             font-size: 12px;
             color: rgba(255,200,0,.8);
-            margin-bottom: 16px;
-        }
-
-        .review-actions {
-            display: flex;
-            gap: 12px;
             margin-top: 16px;
         }
+        .review-actions { display: flex; gap: 12px; margin-top: 16px; }
+        .review-actions .btn { flex: 1; font-size: 12px; padding: 10px 8px; }
 
-        .review-actions .btn {
-            flex: 1;
-        }
-
-        /* CELEBRATION SCREEN */
-        .celebration-trophy {
-            font-size: 80px;
-            text-align: center;
-            margin: 30px 0;
-            animation: float 3s ease infinite;
-        }
-
+        /* CELEBRATION */
+        .celebration-trophy { font-size: 80px; text-align: center; margin: 30px 0; animation: float 3s ease infinite; }
         .celebration-title {
             text-align: center;
             font-size: 24px;
@@ -675,36 +585,10 @@
             margin-bottom: 24px;
             letter-spacing: 2px;
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .stat-box {
-            background: rgba(0,100,200,.1);
-            border: 1px solid rgba(0,255,255,.3);
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #00FFFF;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: rgba(0,255,255,.5);
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-box { background: rgba(0,100,200,.1); border: 1px solid rgba(0,255,255,.3); border-radius: 8px; padding: 12px; text-align: center; }
+        .stat-value { font-size: 20px; font-weight: 700; color: #00FFFF; display: block; }
+        .stat-label { font-size: 11px; color: rgba(0,255,255,.5); text-transform: uppercase; margin-top: 4px; }
         .promotion-badge {
             background: rgba(0,200,255,.15);
             border: 2px solid rgba(0,255,255,.5);
@@ -716,7 +600,6 @@
             font-weight: 600;
             text-transform: uppercase;
         }
-
         .prize-beacon {
             background: rgba(255,200,0,.15);
             border: 1px solid rgba(255,200,0,.4);
@@ -729,357 +612,646 @@
         }
 
         /* VERSION BADGE */
-        .version-badge {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 10px;
-            color: rgba(0,255,255,.3);
-            text-transform: uppercase;
-            z-index: 100;
-        }
+        .version-badge { position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: rgba(0,255,255,.3); text-transform: uppercase; z-index: 100; }
 
         /* SCROLLBAR */
-        .screen::-webkit-scrollbar {
-            width: 6px;
-        }
+        .screen::-webkit-scrollbar { width: 6px; }
+        .screen::-webkit-scrollbar-track { background: rgba(0,50,100,.1); }
+        .screen::-webkit-scrollbar-thumb { background: rgba(0,255,255,.3); border-radius: 3px; }
+        .screen::-webkit-scrollbar-thumb:hover { background: rgba(0,255,255,.6); }
 
-        .screen::-webkit-scrollbar-track {
-            background: rgba(0,50,100,.1);
-        }
+        /* HELPERS */
+        .flex-center { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .mt { margin-top: 16px; }
+        .spacer { flex: 1; }
 
-        .screen::-webkit-scrollbar-thumb {
-            background: rgba(0,255,255,.3);
-            border-radius: 3px;
-        }
-
-        .screen::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,255,255,.6);
-        }
-
-        /* FLEX HELPERS */
-        .flex-center {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .mt {
-            margin-top: 16px;
-        }
-
-        .spacer {
-            flex: 1;
+        /* BUG-03 PRINT STYLES */
+        @media print {
+            body { background: white !important; color: black !important; overflow: visible !important; height: auto !important; }
+            body::before { display: none !important; }
+            .container { max-width: 100% !important; height: auto !important; padding: 20px !important; }
+            .screen { display: none !important; overflow: visible !important; }
+            #s-practice { display: block !important; overflow: visible !important; }
+            .topbar, .success-banner, .action-section, .btn, .version-badge { display: none !important; }
+            #s-practice::before {
+                content: 'MATH MISSION — Practice Worksheet';
+                display: block;
+                font-size: 20px;
+                font-weight: bold;
+                text-align: center;
+                margin-bottom: 24px;
+                color: black;
+                border-bottom: 2px solid #333;
+                padding-bottom: 12px;
+            }
+            .question-card {
+                background: white !important;
+                border: 1px solid #bbb !important;
+                animation: none !important;
+                page-break-inside: avoid;
+                margin-bottom: 20px !important;
+                box-shadow: none !important;
+            }
+            .question-num  { background: #eee !important; color: black !important; }
+            .question-text { color: black !important; }
+            .calc-field {
+                background: white !important;
+                border: 1px dashed #aaa !important;
+                color: #aaa !important;
+                min-height: 80px !important;
+            }
+            .calc-field:empty::before { content: 'Show your work here...' !important; color: #ccc !important; }
+            .answer-input  { background: white !important; border: 1px solid #bbb !important; color: black !important; }
+            .section-label { background: #f0f0f0 !important; border: 1px solid #ccc !important; color: #666 !important; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- SCREEN 1: WELCOME -->
-        <div id="s-welcome" class="screen active">
-            <div class="flex-center" style="flex: 1;">
-                <div class="rocket-ring">🚀</div>
-                <h1>MATH MISSION</h1>
+<div class="container">
 
-                <div class="card" style="width: 100%; margin-top: 20px;">
-                    <div class="mission-stats">
-                        <div>COMMANDER GABE</div>
-                        <div style="font-size: 16px; font-weight: 700; color: #00FFFF; margin-top: 4px;">LEVEL 4</div>
-                        <div style="margin-top: 8px;">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 65%;"></div>
-                            </div>
-                            <div style="font-size: 11px; margin-top: 4px;">65% MISSION PROGRESS</div>
+    <!-- ══════════════════════════════════
+         SCREEN 1: WELCOME
+    ══════════════════════════════════ -->
+    <div id="s-welcome" class="screen active">
+        <div class="flex-center" style="flex:1;">
+            <div class="rocket-ring">🚀</div>
+            <h1>MATH MISSION</h1>
+
+            <div class="card" style="width:100%;margin-top:20px;">
+                <div class="mission-stats">
+                    <!-- BUG-09 FIX: names are injected from appState -->
+                    <div id="welcome-cadet-name">COMMANDER GABE</div>
+                    <div id="welcome-level" style="font-size:16px;font-weight:700;color:#00FFFF;margin-top:4px;">LEVEL 4</div>
+                    <div style="margin-top:8px;">
+                        <div class="progress-bar">
+                            <!-- BUG-10 FIX: width stays as set; shimmer doesn't override it -->
+                            <div class="progress-fill" id="welcome-progress" style="width:65%;"></div>
                         </div>
+                        <div style="font-size:11px;margin-top:4px;">65% MISSION PROGRESS</div>
                     </div>
                 </div>
-
-                <button class="btn primary" onclick="show('s-setup')">◉ ACTIVATE MISSION</button>
-            </div>
-        </div>
-
-        <!-- SCREEN 2: SETUP -->
-        <div id="s-setup" class="screen">
-            <div class="topbar">📡 MISSION SETUP</div>
-
-            <div class="form-group">
-                <label>Cadet Name</label>
-                <input type="text" placeholder="e.g., Gabe">
             </div>
 
-            <div class="form-group">
-                <label>Tutor Name</label>
-                <input type="text" placeholder="e.g., Auntie Mia">
-            </div>
-
-            <div class="form-group">
-                <label>Test File Upload</label>
-                <div class="upload-zone">
-                    <div style="font-size: 28px;">📡</div>
-                    <div class="upload-zone-label">BEAM TEST FILE TO MISSION COMPUTER</div>
-                    <div style="font-size: 11px; color: rgba(0,255,255,.4); margin-top: 6px;">PDF or Image</div>
-                </div>
-            </div>
-
-            <div class="card amber-accent">
-                <p>💡 <strong>MISSION TIP:</strong> Upload a test or worksheet to analyze questions and create a practice mission for Gabe.</p>
-            </div>
-
-            <div class="spacer"></div>
-
-            <button class="btn primary" onclick="show('s-ai')">➜ PROCEED TO ANALYSIS</button>
-            <button class="btn" onclick="show('s-welcome')" style="margin-top: 12px;">◂ SKIP SETUP</button>
-        </div>
-
-        <!-- SCREEN 3: AI EXTRACTION -->
-        <div id="s-ai" class="screen">
-            <div class="topbar">⚙️ NEURAL NETWORK PROCESSING</div>
-
-            <div class="flex-center" style="margin-top: 30px;">
-                <div class="scanning-ring"></div>
-                <div class="scanning-text">SCANNING TEST DOCUMENT...</div>
-            </div>
-
-            <div class="card" style="margin-top: 20px;">
-                <h3 style="text-align: center; color: #00FF64;">ANALYSIS COMPLETE</h3>
-                <div style="text-align: center; font-size: 13px; color: rgba(0,255,255,.7);">
-                    <div style="margin-bottom: 8px;"><strong>MISSION SCORE:</strong> 55/100</div>
-                    <div><strong>THREATS DETECTED:</strong> 5</div>
-                </div>
-            </div>
-
-            <h3 style="margin-top: 20px;">THREAT MATRIX</h3>
-            <div id="threat-list"></div>
-
-            <div class="spacer"></div>
-
-            <button class="btn primary" onclick="show('s-practice')">🔧 COMPILE MISSION DATA</button>
-            <button class="btn" onclick="addThreat()" style="margin-top: 12px;">+ ADD GHOST THREAT</button>
-        </div>
-
-        <!-- SCREEN 4: PRACTICE SHEET -->
-        <div id="s-practice" class="screen">
-            <div class="topbar">✓ MISSION PACKAGE COMPILED</div>
-
-            <div class="success-banner">🎯 MISSION PACKAGE COMPILED — READY FOR DEBRIEF</div>
-
-            <div class="question-card">
-                <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                    <div class="question-num">1</div>
-                    <div style="flex: 1;">
-                        <div class="question-text">What is <strong>24 ÷ 4</strong>?</div>
-                    </div>
-                </div>
-                <div class="section-label">CALCULATION FIELD</div>
-                <div class="calc-field">Show your work here...</div>
-                <input type="number" class="answer-input" placeholder="Answer">
-            </div>
-
-            <div class="question-card">
-                <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                    <div class="question-num">2</div>
-                    <div style="flex: 1;">
-                        <div class="question-text">Solve: <strong>15 + 8</strong></div>
-                    </div>
-                </div>
-                <div class="section-label">CALCULATION FIELD</div>
-                <div class="calc-field">Show your work here...</div>
-                <input type="number" class="answer-input" placeholder="Answer">
-            </div>
-
-            <div class="question-card">
-                <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                    <div class="question-num">3</div>
-                    <div style="flex: 1;">
-                        <div class="question-text">What is <strong>7 × 5</strong>?</div>
-                    </div>
-                </div>
-                <div class="section-label">CALCULATION FIELD</div>
-                <div class="calc-field">Show your work here...</div>
-                <input type="number" class="answer-input" placeholder="Answer">
-            </div>
-
-            <!-- PRINT SECTION -->
-            <div class="action-section cyan">
-                <h3 style="color: #00FFFF; margin-bottom: 12px;">📄 MATERIALIZE WORKSHEET</h3>
-                <p style="font-size: 12px; color: rgba(0,255,255,.6); margin-bottom: 12px;">Generates 8×11 printable sheet with calculation fields for Gabe to work on.</p>
-                <button class="btn" style="width: 100%; border-color: rgba(0,255,255,.6); background: rgba(0,200,255,.2); color: #FFFFFF;">🖨️ GENERATE PRINTABLE</button>
-            </div>
-
-            <!-- UPLOAD SECTION -->
-            <div class="action-section">
-                <h3 style="color: #00FFFF; margin-bottom: 12px;">📸 UPLOAD CADET'S WORK</h3>
-                <p style="font-size: 12px; color: rgba(0,255,255,.6); margin-bottom: 12px;">Beam Gabe's completed answers to Mission Computer for instant analysis.</p>
-                <div class="upload-zone" style="margin-bottom: 12px;">
-                    <div style="font-size: 24px;">📸</div>
-                    <div class="upload-zone-label">UPLOAD COMPLETED WORKSHEET</div>
-                </div>
-                <button class="btn primary">🚀 BEAM UP FILE</button>
-            </div>
-
-            <button class="btn primary mt" onclick="show('s-review')">▶ BEGIN MISSION DEBRIEF</button>
-        </div>
-
-        <!-- SCREEN 5: REVIEW SESSION -->
-        <div id="s-review" class="screen">
-            <div class="topbar">📊 MISSION DEBRIEF — LIVE</div>
-
-            <div class="progress-dots" id="progress-dots"></div>
-
-            <div class="objective-header">OBJECTIVE 3 OF 5 — 2 COMPLETE</div>
-
-            <!-- REVIEW CARD -->
-            <div class="review-card">
-                <h3>
-                    <span style="display: inline-flex; margin-right: 8px;">
-                        <div class="objective-badge">3</div>
-                    </span>
-                    OBJ-003: Solve <strong>24 ÷ 4</strong>
-                </h3>
-
-                <h3 style="margin-top: 16px;">📸 CADET'S TRANSMITTED WORK</h3>
-                <div class="cadet-work-box">
-                    <div style="text-align: center;">
-                        <div style="font-size: 32px; margin-bottom: 8px;">📄</div>
-                        <div style="font-size: 12px;">Holographic rendering of cadet's uploaded work</div>
-                    </div>
-                </div>
-
-                <h3 style="margin-top: 16px;">MISSION RESULT</h3>
-                <div class="mission-result">❌ OBJECTIVE FAILED</div>
-
-                <h3 style="margin-top: 16px;">🔑 MISSION COMPUTER SOLUTION</h3>
-                <div class="solution-steps">
-                    <strong>24 ÷ 4 = 6</strong><br><br>
-                    Step 1: Start with 24<br>
-                    Step 2: Divide by 4<br>
-                    Step 3: Each group has 6<br>
-                    Step 4: Answer = 6
-                </div>
-
-                <div class="hint-panel" style="margin-top: 16px;">
-                    💡 <strong>AI TACTICAL HINT:</strong> Gabe might benefit from reviewing division basics. Try using objects to show equal groups!
-                </div>
-
-                <div class="review-actions">
-                    <button class="btn green">✅ OBJECTIVE CLEARED +20⭐</button>
-                    <button class="btn amber">🔄 RETRY OBJECTIVE</button>
-                </div>
-            </div>
-
-            <button class="btn primary mt" onclick="show('s-celebrate')">➜ CONTINUE MISSION</button>
-        </div>
-
-        <!-- SCREEN 6: CELEBRATION -->
-        <div id="s-celebrate" class="screen">
-            <div class="flex-center" style="flex: 1;">
-                <div class="celebration-trophy">🏆</div>
-                <div class="celebration-title">🎆 ALL OBJECTIVES CLEARED<br>MISSION SUCCESS!</div>
-
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <span class="stat-value">5</span>
-                        <span class="stat-label">Objectives Cleared</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">100⭐</span>
-                        <span class="stat-label">Total Stars</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">8:42</span>
-                        <span class="stat-label">Mission Time</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">4 → 5</span>
-                        <span class="stat-label">Level Up!</span>
-                    </div>
-                </div>
-
-                <div class="promotion-badge">
-                    ⭐ PROMOTED ⭐<br>LEVEL 5 MISSION COMMANDER
-                </div>
-
-                <div class="prize-beacon">
-                    🎁 PRIZE BEACON ACTIVATED<br>
-                    Report to Auntie Mia for rewards!
-                </div>
-
-                <button class="btn primary" onclick="show('s-welcome')">🚀 NEW MISSION</button>
-            </div>
+            <button class="btn primary" onclick="show('s-setup')">◉ ACTIVATE MISSION</button>
         </div>
     </div>
 
-    <div class="version-badge">v2b — Hologram HUD</div>
+    <!-- ══════════════════════════════════
+         SCREEN 2: SETUP
+    ══════════════════════════════════ -->
+    <div id="s-setup" class="screen">
+        <!-- BUG-15 FIX: back button -->
+        <button class="btn back" onclick="show('s-welcome')">◂ BACK</button>
+        <div class="topbar">📡 MISSION SETUP</div>
 
-    <script>
-        function show(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+        <div class="form-group">
+            <label>Cadet Name</label>
+            <!-- BUG-09 FIX: input has ID so JS can read it -->
+            <input type="text" id="cadet-name-input" placeholder="e.g., Gabe">
+        </div>
 
-            // Initialize progress dots for review screen
-            if (screenId === 's-review') {
-                initProgressDots();
-            }
+        <div class="form-group">
+            <label>Tutor Name</label>
+            <input type="text" id="tutor-name-input" placeholder="e.g., Auntie Mia">
+        </div>
 
-            // Populate threat matrix for AI screen
-            if (screenId === 's-ai') {
-                populateThreatMatrix();
-            }
+        <div class="form-group">
+            <label>Test File Upload</label>
+            <!-- BUG-01 FIX: hidden file input; zone click triggers it -->
+            <input type="file" id="setup-file-input" accept=".pdf,image/*">
+            <div class="upload-zone" id="setup-upload-zone">
+                <div style="font-size:28px;">📡</div>
+                <div class="upload-zone-label">BEAM TEST FILE TO MISSION COMPUTER</div>
+                <div style="font-size:11px;color:rgba(0,255,255,.4);margin-top:6px;">PDF or Image — tap to browse</div>
+                <div class="upload-file-name" id="setup-file-label"></div>
+            </div>
+        </div>
+
+        <div class="card amber-accent">
+            <p>💡 <strong>MISSION TIP:</strong> Upload a test or worksheet to analyze questions and create a practice mission.</p>
+        </div>
+
+        <div class="spacer"></div>
+        <button class="btn primary" onclick="saveSetup(); show('s-ai')">➜ PROCEED TO ANALYSIS</button>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN 3: AI EXTRACTION
+    ══════════════════════════════════ -->
+    <div id="s-ai" class="screen">
+        <!-- BUG-15 FIX: back button -->
+        <button class="btn back" onclick="show('s-setup')">◂ BACK</button>
+        <div class="topbar">⚙️ NEURAL NETWORK PROCESSING</div>
+
+        <div class="flex-center" style="margin-top:20px;">
+            <!-- BUG-16 FIX: scanning ring now has an icon -->
+            <div class="scanning-ring">🧠</div>
+            <div class="scanning-text">SCANNING TEST DOCUMENT...</div>
+        </div>
+
+        <div class="card" style="margin-top:8px;">
+            <h3 style="text-align:center;color:#00FF64;">ANALYSIS COMPLETE</h3>
+            <div style="text-align:center;font-size:13px;color:rgba(0,255,255,.7);">
+                <div style="margin-bottom:8px;"><strong>MISSION SCORE:</strong> 55/100</div>
+                <div><strong>THREATS DETECTED:</strong> <span id="threat-count">5</span></div>
+            </div>
+        </div>
+
+        <h3 style="margin-top:20px;">THREAT MATRIX</h3>
+        <!-- BUG-08 FIX: toggles now update appState so practice sheet reflects them -->
+        <div id="threat-list"></div>
+
+        <div class="spacer"></div>
+        <button class="btn primary" onclick="show('s-practice')">🔧 COMPILE MISSION DATA</button>
+        <!-- BUG-13 FIX: real prompt-based addThreat() replaces alert -->
+        <button class="btn" onclick="addThreat()" style="margin-top:12px;">+ ADD GHOST THREAT</button>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN 4: PRACTICE SHEET
+    ══════════════════════════════════ -->
+    <div id="s-practice" class="screen">
+        <!-- BUG-15 FIX: back button -->
+        <button class="btn back" onclick="show('s-ai')">◂ BACK</button>
+        <div class="topbar">✓ MISSION PACKAGE COMPILED</div>
+
+        <div class="success-banner">🎯 MISSION PACKAGE COMPILED — READY FOR DEBRIEF</div>
+
+        <!-- BUG-07 FIX: questions rendered dynamically from ALL active threats -->
+        <div id="questions-container"></div>
+
+        <!-- BUG-03 FIX: wired to window.print() with proper print CSS -->
+        <div class="action-section cyan">
+            <h3 style="color:#00FFFF;margin-bottom:12px;">📄 MATERIALIZE WORKSHEET</h3>
+            <p style="font-size:12px;color:rgba(0,255,255,.6);margin-bottom:12px;">Generates 8×11 printable sheet with calculation fields for Gabe to work on.</p>
+            <button class="btn" onclick="window.print()" style="width:100%;border-color:rgba(0,255,255,.6);background:rgba(0,200,255,.2);color:#FFFFFF;">🖨️ GENERATE PRINTABLE</button>
+        </div>
+
+        <!-- BUG-01 + BUG-04 FIX: real file input + functional beam-up button -->
+        <div class="action-section">
+            <h3 style="color:#00FFFF;margin-bottom:12px;">📸 UPLOAD CADET'S WORK</h3>
+            <p style="font-size:12px;color:rgba(0,255,255,.6);margin-bottom:12px;">Beam Gabe's completed answers to Mission Computer for instant analysis.</p>
+            <input type="file" id="work-file-input" accept="image/*,.pdf">
+            <div class="upload-zone" id="work-upload-zone">
+                <div style="font-size:24px;">📸</div>
+                <div class="upload-zone-label">UPLOAD COMPLETED WORKSHEET</div>
+                <div style="font-size:11px;color:rgba(0,255,255,.4);margin-top:4px;">Image or PDF — tap to browse</div>
+                <div class="upload-file-name" id="work-file-label"></div>
+            </div>
+            <button class="btn primary" id="beam-up-btn">🚀 BEAM UP FILE</button>
+        </div>
+
+        <button class="btn primary mt" onclick="startReview()">▶ BEGIN MISSION DEBRIEF</button>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN 5: REVIEW SESSION
+    ══════════════════════════════════ -->
+    <div id="s-review" class="screen">
+        <!-- BUG-15 FIX: back button -->
+        <button class="btn back" onclick="show('s-practice')">◂ BACK TO PRACTICE</button>
+        <div class="topbar">📊 MISSION DEBRIEF — LIVE</div>
+
+        <!-- BUG-06 + BUG-12 FIX: dots clickable, rendered from state -->
+        <div class="progress-dots" id="progress-dots"></div>
+        <div class="objective-header" id="objective-header">OBJECTIVE 1 OF 5</div>
+
+        <!-- BUG-05 + BUG-06 FIX: entire card is dynamic -->
+        <div id="review-card-container"></div>
+
+        <!-- Revealed after all questions are judged -->
+        <div id="finish-mission-section" style="display:none;">
+            <button class="btn primary mt" onclick="show('s-celebrate')">🏆 FINISH MISSION</button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SCREEN 6: CELEBRATION
+    ══════════════════════════════════ -->
+    <div id="s-celebrate" class="screen">
+        <div class="flex-center" style="flex:1;">
+            <div class="celebration-trophy">🏆</div>
+            <div class="celebration-title">🎆 ALL OBJECTIVES CLEARED<br>MISSION SUCCESS!</div>
+
+            <!-- BUG-11 FIX: all stats come from appState, nothing hardcoded -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-value" id="stat-objectives">—</span>
+                    <span class="stat-label">Objectives Cleared</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="stat-stars">—</span>
+                    <span class="stat-label">Total Stars</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="stat-time">—</span>
+                    <span class="stat-label">Mission Time</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value" id="stat-level">—</span>
+                    <span class="stat-label">Level Up!</span>
+                </div>
+            </div>
+
+            <div class="promotion-badge" id="promotion-badge">
+                ⭐ PROMOTED ⭐<br>LEVEL 5 MISSION COMMANDER
+            </div>
+
+            <!-- BUG-09 FIX: tutor name is dynamic -->
+            <div class="prize-beacon">
+                🎁 PRIZE BEACON ACTIVATED<br>
+                Report to <span id="prize-tutor-name">Auntie Mia</span> for rewards!
+            </div>
+
+            <button class="btn primary" onclick="show('s-welcome')">🚀 NEW MISSION</button>
+        </div>
+    </div>
+
+</div><!-- /container -->
+
+<div class="version-badge">v2b — Hologram HUD</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   APP STATE  — single source of truth for all screens
+═══════════════════════════════════════════════════════════ */
+const appState = {
+    cadetName: 'Gabe',
+    tutorName: 'Auntie Mia',
+    level: 4,
+    stars: 0,
+    startTime: null,
+    currentReviewIndex: 0,
+    results: [],            // per active question: 'pass' | 'retry' | null
+    uploadedWorkImage: null,
+
+    // BUG-08 FIX: single array used by both AI screen AND practice sheet
+    threats: [
+        {
+            num: '24 ÷ 4', text: 'Division of 24 by 4', active: true,
+            steps: '<strong>24 ÷ 4 = 6</strong><br><br>Step 1: Start with 24<br>Step 2: Split into 4 equal groups<br>Step 3: Each group has 6<br>Step 4: Answer = 6',
+            hint: 'Try drawing 24 dots and circling them in groups of 4!'
+        },
+        {
+            num: '15 + 8', text: 'Addition: 15 plus 8', active: true,
+            steps: '<strong>15 + 8 = 23</strong><br><br>Step 1: Start at 15<br>Step 2: Break 8 into 5 + 3<br>Step 3: 15 + 5 = 20, then 20 + 3 = 23<br>Step 4: Answer = 23',
+            hint: 'Try "making a 10" — jump to 20, then add the rest!'
+        },
+        {
+            num: '7 × 5', text: 'Multiplication: 7 times 5', active: true,
+            steps: '<strong>7 × 5 = 35</strong><br><br>Step 1: Think of 7 groups of 5<br>Step 2: Skip count by 5s<br>Step 3: 5, 10, 15, 20, 25, 30, 35<br>Step 4: Answer = 35',
+            hint: 'Skip counting by 5s is super fast — try it on your fingers!'
+        },
+        {
+            num: '18 - 6', text: 'Subtraction: 18 minus 6', active: true,
+            steps: '<strong>18 - 6 = 12</strong><br><br>Step 1: Start with 18<br>Step 2: Count backwards 6 steps<br>Step 3: 18 → 17 → 16 → 15 → 14 → 13 → 12<br>Step 4: Answer = 12',
+            hint: 'Use a number line — put your finger on 18 and hop back 6!'
+        },
+        {
+            num: '3 × 9', text: 'Multiplication: 3 times 9', active: true,
+            steps: '<strong>3 × 9 = 27</strong><br><br>Step 1: Think of 3 groups of 9<br>Step 2: 9 + 9 = 18, then 18 + 9 = 27<br>Step 3: Check: digits of 27 → 2+7 = 9 ✓<br>Step 4: Answer = 27',
+            hint: 'Cool trick: the digits of every multiple of 9 always add up to 9!'
         }
+    ]
+};
 
-        function initProgressDots() {
-            const container = document.getElementById('progress-dots');
-            container.innerHTML = '';
-            for (let i = 1; i <= 5; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'dot' + (i === 3 ? ' active' : '');
-                dot.textContent = i;
-                container.appendChild(dot);
-            }
-        }
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════ */
+function show(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
 
-        function populateThreatMatrix() {
-            const threats = [
-                { num: '24 ÷ 4', text: 'Division of 24 by 4' },
-                { num: '15 + 8', text: 'Addition: 15 plus 8' },
-                { num: '7 × 5', text: 'Multiplication: 7 times 5' },
-                { num: '18 - 6', text: 'Subtraction: 18 minus 6' },
-                { num: '3 × 9', text: 'Multiplication: 3 times 9' }
-            ];
+    switch (screenId) {
+        case 's-welcome':  updateWelcomeScreen(); break;
+        case 's-ai':       populateThreatMatrix(); break;
+        case 's-practice': renderPracticeQuestions(); break;
+        case 's-celebrate': initCelebration(); break;
+    }
+}
 
-            const list = document.getElementById('threat-list');
-            list.innerHTML = '';
+/* ═══════════════════════════════════════════════════════════
+   SCREEN 1 — WELCOME
+═══════════════════════════════════════════════════════════ */
+function updateWelcomeScreen() {
+    // BUG-09 FIX: reflect saved names
+    document.getElementById('welcome-cadet-name').textContent =
+        'COMMANDER ' + appState.cadetName.toUpperCase();
+    document.getElementById('welcome-level').textContent =
+        'LEVEL ' + appState.level;
+}
 
-            threats.forEach((threat, idx) => {
-                const row = document.createElement('div');
-                row.className = 'threat-row';
-                row.innerHTML = `
-                    <div class="hexagon" style="width: 36px; height: 36px; font-size: 14px;">${idx + 1}</div>
-                    <div style="flex: 1;">
-                        <div style="font-size: 13px; color: #FFFFFF; font-weight: 500;">${threat.num}</div>
-                        <div style="font-size: 12px; color: rgba(0,255,255,.5);">${threat.text}</div>
-                    </div>
-                    <span class="threat-badge">THREAT</span>
-                    <div class="toggle active" onclick="event.stopPropagation(); this.classList.toggle('active');">
-                        <div class="toggle-dot"></div>
-                    </div>
-                `;
-                list.appendChild(row);
-            });
-        }
+/* ═══════════════════════════════════════════════════════════
+   SCREEN 2 — SETUP
+═══════════════════════════════════════════════════════════ */
+function saveSetup() {
+    // BUG-09 FIX: read inputs and persist to state
+    const cadet = document.getElementById('cadet-name-input').value.trim();
+    const tutor = document.getElementById('tutor-name-input').value.trim();
+    if (cadet) appState.cadetName = cadet;
+    if (tutor) appState.tutorName = tutor;
+}
 
-        function addThreat() {
-            alert('Ghost Threat added to matrix!');
-        }
+/* ═══════════════════════════════════════════════════════════
+   SCREEN 3 — AI EXTRACTION
+═══════════════════════════════════════════════════════════ */
+function populateThreatMatrix() {
+    const list = document.getElementById('threat-list');
+    list.innerHTML = '';
 
-        // Initialize on load
-        window.addEventListener('load', () => {
+    appState.threats.forEach((threat, idx) => {
+        const row = document.createElement('div');
+        row.className = 'threat-row';
+        row.innerHTML = `
+            <div class="hexagon" style="width:36px;height:36px;font-size:14px;">${idx + 1}</div>
+            <div style="flex:1;">
+                <div style="font-size:13px;color:#FFFFFF;font-weight:500;">${threat.num}</div>
+                <div style="font-size:12px;color:rgba(0,255,255,.5);">${threat.text}</div>
+            </div>
+            <span class="threat-badge">THREAT</span>
+            <div class="toggle ${threat.active ? 'active' : ''}" id="toggle-${idx}"
+                 onclick="toggleThreat(${idx})">
+                <div class="toggle-dot"></div>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+
+    document.getElementById('threat-count').textContent = appState.threats.length;
+}
+
+// BUG-08 FIX: toggle updates appState — practice sheet reads the same array
+function toggleThreat(idx) {
+    appState.threats[idx].active = !appState.threats[idx].active;
+    document.getElementById('toggle-' + idx).classList.toggle('active');
+}
+
+// BUG-13 FIX: real prompt UI adds threat to array and re-renders
+function addThreat() {
+    const num = prompt('Enter the math expression:\n(e.g.  12 × 3)');
+    if (!num || !num.trim()) return;
+    const text = prompt('Short description:\n(e.g.  Multiplication: 12 times 3)') || num.trim();
+    const answer = prompt('Correct answer:') || '?';
+    appState.threats.push({
+        num:    num.trim(),
+        text:   text.trim(),
+        active: true,
+        steps:  '<strong>' + num.trim() + ' = ' + answer.trim() + '</strong><br><br>Work through each step carefully with your tutor.',
+        hint:   'Take your time and show all your working out!'
+    });
+    populateThreatMatrix();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREEN 4 — PRACTICE SHEET
+═══════════════════════════════════════════════════════════ */
+// BUG-07 FIX: ALL active threats become questions (not just the first 3)
+function renderPracticeQuestions() {
+    const active = appState.threats.filter(t => t.active);
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+
+    if (active.length === 0) {
+        container.innerHTML =
+            '<div class="card" style="text-align:center;color:rgba(0,255,255,.5);">' +
+            'No threats active — go back and enable some!</div>';
+        return;
+    }
+
+    active.forEach((threat, i) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.innerHTML = `
+            <div style="display:flex;align-items:center;margin-bottom:12px;">
+                <div class="question-num">${i + 1}</div>
+                <div style="flex:1;">
+                    <div class="question-text">Solve: <strong>${threat.num}</strong></div>
+                </div>
+            </div>
+            <div class="section-label">CALCULATION FIELD</div>
+            <!-- BUG-02 FIX: contenteditable lets Gabe type his working out -->
+            <div class="calc-field" contenteditable="true"
+                 data-placeholder="Show your work here..."></div>
+            <input type="number" class="answer-input" placeholder="Answer">
+        `;
+        container.appendChild(card);
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREEN 5 — REVIEW
+═══════════════════════════════════════════════════════════ */
+// Called by "BEGIN MISSION DEBRIEF" — initialises fresh review state
+function startReview() {
+    const active = appState.threats.filter(t => t.active);
+    if (active.length === 0) {
+        alert('No active threats to review! Go back and enable some.');
+        return;
+    }
+    appState.results = new Array(active.length).fill(null);
+    appState.currentReviewIndex = 0;
+    appState.stars = 0;
+    appState.startTime = Date.now();
+
+    document.getElementById('finish-mission-section').style.display = 'none';
+
+    show('s-review');
+    initProgressDots();
+    renderReviewCard();
+}
+
+// BUG-06 + BUG-12 FIX: dots are clickable and reflect real pass/retry state
+function initProgressDots() {
+    const active = appState.threats.filter(t => t.active);
+    const container = document.getElementById('progress-dots');
+    container.innerHTML = '';
+
+    active.forEach((_, i) => {
+        const dot = document.createElement('div');
+        let cls = 'dot';
+        if (i === appState.currentReviewIndex) cls += ' active';
+        if (appState.results[i] === 'pass')  cls += ' passed';
+        if (appState.results[i] === 'retry') cls += ' retried';
+        dot.className = cls;
+        dot.textContent = i + 1;
+        dot.title = 'Jump to Question ' + (i + 1);
+        dot.addEventListener('click', () => {
+            appState.currentReviewIndex = i;
             initProgressDots();
-            populateThreatMatrix();
+            renderReviewCard();
         });
-    </script>
+        container.appendChild(dot);
+    });
+
+    // BUG-12 FIX: header is fully dynamic
+    const completed = appState.results.filter(r => r !== null).length;
+    document.getElementById('objective-header').textContent =
+        'OBJECTIVE ' + (appState.currentReviewIndex + 1) +
+        ' OF ' + active.length +
+        ' — ' + completed + ' COMPLETE';
+}
+
+// BUG-05 + BUG-06 FIX: review card built from state, not hardcoded
+function renderReviewCard() {
+    const active = appState.threats.filter(t => t.active);
+    const q      = active[appState.currentReviewIndex];
+    const result = appState.results[appState.currentReviewIndex];
+
+    const workHTML = appState.uploadedWorkImage
+        ? '<img src="' + appState.uploadedWorkImage + '" alt="Cadet\'s work">'
+        : '<div style="text-align:center;">' +
+          '<div style="font-size:32px;margin-bottom:8px;">📄</div>' +
+          '<div style="font-size:12px;">No photo uploaded yet<br>' +
+          '<span style="font-size:11px;color:rgba(0,255,255,.3);">Upload on the Practice Sheet screen</span></div>' +
+          '</div>';
+
+    const actionHTML = result !== null
+        ? '<div class="mission-result ' + (result === 'pass' ? 'success' : '') + '">' +
+          (result === 'pass' ? '✅ OBJECTIVE CLEARED +20⭐' : '🔄 RETRY NEEDED') +
+          '</div>'
+        : '<div class="review-actions">' +
+          '<button class="btn green" onclick="markObjective(\'pass\')">✅ OBJECTIVE CLEARED +20⭐</button>' +
+          '<button class="btn amber" onclick="markObjective(\'retry\')">🔄 RETRY OBJECTIVE</button>' +
+          '</div>';
+
+    document.getElementById('review-card-container').innerHTML =
+        '<div class="review-card">' +
+            '<h3>' +
+                '<div class="objective-badge">' + (appState.currentReviewIndex + 1) + '</div>' +
+                'OBJ-' + String(appState.currentReviewIndex + 1).padStart(3, '0') + ': Solve <strong>' + q.num + '</strong>' +
+            '</h3>' +
+            '<h3 style="margin-top:16px;">📸 CADET\'S TRANSMITTED WORK</h3>' +
+            '<div class="cadet-work-box">' + workHTML + '</div>' +
+            '<h3 style="margin-top:16px;">MISSION RESULT</h3>' +
+            actionHTML +
+            '<h3 style="margin-top:16px;">🔑 MISSION COMPUTER SOLUTION</h3>' +
+            '<div class="solution-steps">' + q.steps + '</div>' +
+            '<div class="hint-panel">💡 <strong>AI TACTICAL HINT:</strong> ' + q.hint + '</div>' +
+        '</div>';
+}
+
+// BUG-05 FIX: marks question, awards stars, auto-advances to next unanswered
+function markObjective(verdict) {
+    appState.results[appState.currentReviewIndex] = verdict;
+    if (verdict === 'pass') appState.stars += 20;
+
+    renderReviewCard();   // show result badge immediately
+    initProgressDots();
+
+    const total   = appState.threats.filter(t => t.active).length;
+    const allDone = appState.results.every(r => r !== null);
+
+    if (allDone) {
+        document.getElementById('finish-mission-section').style.display = 'block';
+    } else {
+        // Advance to next unanswered question after a brief pause
+        setTimeout(() => {
+            let next = (appState.currentReviewIndex + 1) % total;
+            while (appState.results[next] !== null) {
+                next = (next + 1) % total;
+            }
+            appState.currentReviewIndex = next;
+            initProgressDots();
+            renderReviewCard();
+        }, 700);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCREEN 6 — CELEBRATION
+═══════════════════════════════════════════════════════════ */
+// BUG-11 FIX: real stats from appState, not hardcoded placeholders
+function initCelebration() {
+    const active  = appState.threats.filter(t => t.active);
+    const passed  = appState.results.filter(r => r === 'pass').length;
+    const total   = active.length;
+
+    const elapsed = appState.startTime
+        ? Math.floor((Date.now() - appState.startTime) / 1000)
+        : 0;
+    const mins    = Math.floor(elapsed / 60);
+    const secs    = elapsed % 60;
+    const timeStr = mins + ':' + String(secs).padStart(2, '0');
+
+    const newLevel = (passed === total && total > 0)
+        ? appState.level + 1
+        : appState.level;
+
+    document.getElementById('stat-objectives').textContent = passed + '/' + total;
+    document.getElementById('stat-stars').textContent      = appState.stars + '⭐';
+    document.getElementById('stat-time').textContent       = timeStr;
+    document.getElementById('stat-level').textContent      = appState.level + ' → ' + newLevel;
+
+    // BUG-09 FIX: names are dynamic throughout
+    document.getElementById('promotion-badge').innerHTML =
+        '⭐ PROMOTED ⭐<br>LEVEL ' + newLevel + ' MISSION COMMANDER — ' +
+        appState.cadetName.toUpperCase();
+    document.getElementById('prize-tutor-name').textContent = appState.tutorName;
+
+    appState.level = newLevel;
+    updateWelcomeScreen();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FILE UPLOAD WIRING  (BUG-01 + BUG-04)
+═══════════════════════════════════════════════════════════ */
+function setupUploads() {
+    // Setup screen
+    const setupInput = document.getElementById('setup-file-input');
+    const setupZone  = document.getElementById('setup-upload-zone');
+    const setupLabel = document.getElementById('setup-file-label');
+    setupZone.addEventListener('click', () => setupInput.click());
+    setupInput.addEventListener('change', e => {
+        const f = e.target.files[0];
+        if (f) setupLabel.textContent = '✓ ' + f.name;
+    });
+
+    // Practice sheet
+    const workInput = document.getElementById('work-file-input');
+    const workZone  = document.getElementById('work-upload-zone');
+    const workLabel = document.getElementById('work-file-label');
+    const beamBtn   = document.getElementById('beam-up-btn');
+
+    workZone.addEventListener('click', () => workInput.click());
+
+    workInput.addEventListener('change', e => {
+        const f = e.target.files[0];
+        if (!f) return;
+        workLabel.textContent = '✓ ' + f.name;
+        // If image, read for display in review screen
+        if (f.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = ev => { appState.uploadedWorkImage = ev.target.result; };
+            reader.readAsDataURL(f);
+        } else {
+            appState.uploadedWorkImage = null;
+        }
+    });
+
+    // BUG-04 FIX: beam-up button opens picker if empty, confirms if file ready
+    beamBtn.addEventListener('click', () => {
+        if (!workInput.files || !workInput.files[0]) {
+            workInput.click();
+        } else {
+            workLabel.textContent      = '✅ File beamed up successfully!';
+            beamBtn.textContent        = '✅ BEAMED UP';
+            beamBtn.style.borderColor  = 'rgba(0,255,100,.5)';
+            beamBtn.style.color        = '#00FF64';
+            beamBtn.style.background   = 'rgba(0,200,100,.1)';
+        }
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+window.addEventListener('load', () => {
+    setupUploads();
+    updateWelcomeScreen();
+    populateThreatMatrix();
+});
+</script>
 
 </body>
 </html>
