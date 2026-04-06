@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATH MISSION — Hologram HUD v2b</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000008;
+            color: #00FFFF;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* NEBULA & STARS BACKGROUND */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(1px 1px at 5% 8%, white, transparent),
+                radial-gradient(1px 1px at 12% 15%, white, transparent),
+                radial-gradient(1px 1px at 18% 22%, white, transparent),
+                radial-gradient(1px 1px at 25% 12%, white, transparent),
+                radial-gradient(1px 1px at 32% 35%, white, transparent),
+                radial-gradient(1px 1px at 40% 8%, white, transparent),
+                radial-gradient(1px 1px at 48% 45%, white, transparent),
+                radial-gradient(1px 1px at 55% 18%, white, transparent),
+                radial-gradient(1px 1px at 62% 65%, white, transparent),
+                radial-gradient(1px 1px at 70% 25%, white, transparent),
+                radial-gradient(1px 1px at 78% 75%, white, transparent),
+                radial-gradient(1px 1px at 85% 35%, white, transparent),
+                radial-gradient(1px 1px at 92% 55%, white, transparent),
+                radial-gradient(1px 1px at 8% 72%, white, transparent),
+                radial-gradient(1px 1px at 15% 88%, white, transparent),
+                radial-gradient(1px 1px at 35% 82%, white, transparent),
+                radial-gradient(1px 1px at 52% 92%, white, transparent),
+                radial-gradient(1px 1px at 68% 78%, white, transparent),
+                radial-gradient(1px 1px at 88% 88%, white, transparent),
+                radial-gradient(1px 1px at 42% 42%, white, transparent),
+                radial-gradient(ellipse at 20% 60%, rgba(80,0,200,.15) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 30%, rgba(0,80,200,.12) 0%, transparent 55%);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            background-attachment: fixed;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+        }
+
+        /* SCREEN DISPLAY */
+        .screen {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* HOLOGRAPHIC ANIMATIONS */
+        @keyframes holo-pulse {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(0,255,255,.3), inset 0 0 8px rgba(0,255,255,.1);
+                border-color: rgba(0,255,255,.4);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0,255,255,.7), inset 0 0 15px rgba(0,255,255,.2);
+                border-color: rgba(0,255,255,.8);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* HOLOGRAPHIC CARD STYLE */
+        .card {
+            background: rgba(0,128,255,.06);
+            border: 1px solid rgba(0,255,255,.35);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            animation: holo-pulse 3s ease infinite;
+        }
+
+        .card.green-accent {
+            border-color: rgba(0,255,100,.4);
+            box-shadow: 0 0 12px rgba(0,255,100,.2), inset 0 0 8px rgba(0,255,100,.08);
+        }
+
+        .card.amber-accent {
+            border-color: rgba(255,180,0,.4);
+            box-shadow: 0 0 12px rgba(255,180,0,.2), inset 0 0 8px rgba(255,180,0,.08);
+        }
+
+        /* TOPBAR */
+        .topbar {
+            background: rgba(0,50,100,.3);
+            border-bottom: 1px solid rgba(0,255,255,.25);
+            padding: 12px 0;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* HEXAGON BADGE */
+        .hexagon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,255,255,.2);
+            border: 1px solid rgba(0,255,255,.5);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            font-weight: bold;
+            font-size: 18px;
+            color: #00FFFF;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 12px 20px;
+            border: 1.5px solid rgba(0,255,255,.5);
+            background: rgba(0,128,255,.15);
+            color: #00FFFF;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            animation: holo-pulse 3s ease infinite;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: rgba(0,128,255,.3);
+            box-shadow: 0 0 20px rgba(0,255,255,.6);
+            transform: scale(1.05);
+        }
+
+        .btn.primary {
+            border-color: rgba(0,255,255,.6);
+            background: rgba(0,200,255,.2);
+            color: #FFFFFF;
+            font-weight: 700;
+            padding: 16px 24px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .btn.green {
+            border-color: rgba(0,255,100,.5);
+            background: rgba(0,200,100,.1);
+            color: #00FF64;
+        }
+
+        .btn.amber {
+            border-color: rgba(255,180,0,.5);
+            background: rgba(255,180,0,.1);
+            color: #FFB400;
+        }
+
+        /* INPUTS */
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+            width: 100%;
+            background: rgba(0,128,255,.05);
+            border: none;
+            border-bottom: 1px solid rgba(0,255,255,.4);
+            color: #00FFFF;
+            padding: 12px 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus {
+            border-bottom-color: rgba(0,255,255,.8);
+            box-shadow: 0 0 10px rgba(0,255,255,.3);
+        }
+
+        input::placeholder {
+            color: rgba(0,255,255,.4);
+        }
+
+        /* UPLOAD ZONE */
+        .upload-zone {
+            border: 2px dashed rgba(0,255,255,.5);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            background: rgba(0,50,100,.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: holo-pulse 4s ease infinite;
+            margin-bottom: 12px;
+        }
+
+        .upload-zone:hover {
+            border-color: rgba(0,255,255,.8);
+            background: rgba(0,100,200,.15);
+        }
+
+        .upload-zone-label {
+            font-size: 13px;
+            color: rgba(0,255,255,.7);
+            margin-top: 8px;
+        }
+
+        /* PROGRESS BAR */
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(0,255,255,.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 12px 0;
+            border: 1px solid rgba(0,255,255,.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0080FF, #00FFFF);
+            animation: slide 2s ease infinite;
+        }
+
+        @keyframes slide {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        /* TITLE */
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #00FFFF, #0080FF, #00FFFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #00FFFF;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #00FFFF;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            font-size: 13px;
+            color: rgba(0,255,255,.8);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        /* WELCOME SCREEN */
+        .rocket-ring {
+            width: 120px;
+            height: 120px;
+            border: 2px solid rgba(0,255,255,.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto 20px;
+            animation: spin 8s linear infinite;
+            font-size: 60px;
+        }
+
+        .mission-stats {
+            text-align: center;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .mission-stats div {
+            color: rgba(0,255,255,.7);
+            margin-bottom: 4px;
+        }
+
+        /* SETUP SCREEN */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: rgba(0,255,255,.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        /* AI EXTRACTION SCREEN */
+        .scanning-ring {
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(0,255,255,.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            animation: spin 4s linear infinite;
+        }
+
+        .scanning-text {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(0,255,255,.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .threat-row {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: rgba(0,50,100,.1);
+            border: 1px solid rgba(200,0,0,.3);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .threat-badge {
+            background: rgba(200,0,0,.3);
+            border: 1px solid rgba(200,0,0,.6);
+            color: #FF6B6B;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .toggle {
+            width: 40px;
+            height: 20px;
+            background: rgba(0,100,200,.3);
+            border: 1px solid rgba(0,255,255,.3);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            transition: all 0.3s;
+            margin-left: auto;
+        }
+
+        .toggle.active {
+            background: rgba(0,255,100,.3);
+            border-color: rgba(0,255,100,.6);
+        }
+
+        .toggle-dot {
+            width: 16px;
+            height: 16px;
+            background: #00FFFF;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle.active .toggle-dot {
+            transform: translateX(18px);
+            background: #00FF64;
+        }
+
+        /* PRACTICE SHEET SCREEN */
+        .success-banner {
+            background: rgba(0,200,100,.15);
+            border: 1px solid rgba(0,255,100,.4);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            color: #00FF64;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .question-card {
+            background: rgba(0,100,150,.08);
+            border: 1px solid rgba(0,200,255,.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            animation: holo-pulse 3s ease infinite;
+        }
+
+        .question-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: rgba(0,200,255,.2);
+            border: 1px solid rgba(0,255,255,.5);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            font-weight: bold;
+            font-size: 16px;
+            color: #00FFFF;
+            margin-right: 10px;
+        }
+
+        .question-text {
+            font-size: 14px;
+            color: #FFFFFF;
+            margin-bottom: 12px;
+        }
+
+        .calc-field {
+            background: rgba(0,50,100,.1);
+            border: 1px dashed rgba(0,255,255,.3);
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 60px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: rgba(0,255,255,.5);
+        }
+
+        .answer-input {
+            width: 100%;
+            background: rgba(0,100,150,.1);
+            border: 1px solid rgba(0,255,255,.4);
+            border-radius: 6px;
+            padding: 10px;
+            color: #00FFFF;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .answer-input::placeholder {
+            color: rgba(0,255,255,.3);
+        }
+
+        .section-label {
+            display: inline-block;
+            background: rgba(0,200,200,.15);
+            border: 1px solid rgba(0,255,255,.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: rgba(0,255,255,.6);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .action-section {
+            border-top: 1px solid rgba(0,255,255,.2);
+            padding-top: 16px;
+            margin-top: 16px;
+        }
+
+        .action-section.cyan {
+            border-top-color: rgba(0,255,255,.4);
+        }
+
+        /* REVIEW SCREEN */
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,255,255,.3);
+            background: rgba(0,100,150,.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: rgba(0,255,255,.5);
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            border-color: rgba(0,255,255,.8);
+            background: rgba(0,200,255,.3);
+            color: #00FFFF;
+            box-shadow: 0 0 12px rgba(0,255,255,.4);
+        }
+
+        .objective-header {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(0,255,255,.6);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .review-card {
+            background: rgba(0,80,150,.08);
+            border: 1px solid rgba(0,180,255,.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .review-card h3 {
+            color: #00FFFF;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .objective-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: rgba(0,200,255,.15);
+            border: 1px solid rgba(0,255,255,.4);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            font-weight: bold;
+            font-size: 18px;
+            color: #00FFFF;
+        }
+
+        .cadet-work-box {
+            background: rgba(0,30,60,.3);
+            border: 1px dashed rgba(0,150,200,.4);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            color: rgba(0,255,255,.4);
+            font-size: 13px;
+            margin-bottom: 12px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mission-result {
+            background: rgba(200,0,0,.15);
+            border: 1px solid rgba(200,0,0,.4);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #FF6B6B;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mission-result.success {
+            background: rgba(0,200,100,.15);
+            border-color: rgba(0,255,100,.4);
+            color: #00FF64;
+        }
+
+        .solution-steps {
+            background: rgba(0,100,150,.1);
+            border: 1px solid rgba(0,200,255,.3);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            color: rgba(0,255,255,.8);
+            line-height: 1.8;
+        }
+
+        .hint-panel {
+            background: rgba(255,180,0,.08);
+            border: 1px solid rgba(255,180,0,.3);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            color: rgba(255,200,0,.8);
+            margin-bottom: 16px;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .review-actions .btn {
+            flex: 1;
+        }
+
+        /* CELEBRATION SCREEN */
+        .celebration-trophy {
+            font-size: 80px;
+            text-align: center;
+            margin: 30px 0;
+            animation: float 3s ease infinite;
+        }
+
+        .celebration-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #00FF64;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            letter-spacing: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(0,100,200,.1);
+            border: 1px solid rgba(0,255,255,.3);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00FFFF;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: rgba(0,255,255,.5);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .promotion-badge {
+            background: rgba(0,200,255,.15);
+            border: 2px solid rgba(0,255,255,.5);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00FFFF;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .prize-beacon {
+            background: rgba(255,200,0,.15);
+            border: 1px solid rgba(255,200,0,.4);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            color: #FFD700;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* VERSION BADGE */
+        .version-badge {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: rgba(0,255,255,.3);
+            text-transform: uppercase;
+            z-index: 100;
+        }
+
+        /* SCROLLBAR */
+        .screen::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .screen::-webkit-scrollbar-track {
+            background: rgba(0,50,100,.1);
+        }
+
+        .screen::-webkit-scrollbar-thumb {
+            background: rgba(0,255,255,.3);
+            border-radius: 3px;
+        }
+
+        .screen::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,255,255,.6);
+        }
+
+        /* FLEX HELPERS */
+        .flex-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mt {
+            margin-top: 16px;
+        }
+
+        .spacer {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- SCREEN 1: WELCOME -->
+        <div id="s-welcome" class="screen active">
+            <div class="flex-center" style="flex: 1;">
+                <div class="rocket-ring">🚀</div>
+                <h1>MATH MISSION</h1>
+
+                <div class="card" style="width: 100%; margin-top: 20px;">
+                    <div class="mission-stats">
+                        <div>COMMANDER GABE</div>
+                        <div style="font-size: 16px; font-weight: 700; color: #00FFFF; margin-top: 4px;">LEVEL 4</div>
+                        <div style="margin-top: 8px;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%;"></div>
+                            </div>
+                            <div style="font-size: 11px; margin-top: 4px;">65% MISSION PROGRESS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn primary" onclick="show('s-setup')">◉ ACTIVATE MISSION</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: SETUP -->
+        <div id="s-setup" class="screen">
+            <div class="topbar">📡 MISSION SETUP</div>
+
+            <div class="form-group">
+                <label>Cadet Name</label>
+                <input type="text" placeholder="e.g., Gabe">
+            </div>
+
+            <div class="form-group">
+                <label>Tutor Name</label>
+                <input type="text" placeholder="e.g., Auntie Mia">
+            </div>
+
+            <div class="form-group">
+                <label>Test File Upload</label>
+                <div class="upload-zone">
+                    <div style="font-size: 28px;">📡</div>
+                    <div class="upload-zone-label">BEAM TEST FILE TO MISSION COMPUTER</div>
+                    <div style="font-size: 11px; color: rgba(0,255,255,.4); margin-top: 6px;">PDF or Image</div>
+                </div>
+            </div>
+
+            <div class="card amber-accent">
+                <p>💡 <strong>MISSION TIP:</strong> Upload a test or worksheet to analyze questions and create a practice mission for Gabe.</p>
+            </div>
+
+            <div class="spacer"></div>
+
+            <button class="btn primary" onclick="show('s-ai')">➜ PROCEED TO ANALYSIS</button>
+            <button class="btn" onclick="show('s-welcome')" style="margin-top: 12px;">◂ SKIP SETUP</button>
+        </div>
+
+        <!-- SCREEN 3: AI EXTRACTION -->
+        <div id="s-ai" class="screen">
+            <div class="topbar">⚙️ NEURAL NETWORK PROCESSING</div>
+
+            <div class="flex-center" style="margin-top: 30px;">
+                <div class="scanning-ring"></div>
+                <div class="scanning-text">SCANNING TEST DOCUMENT...</div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3 style="text-align: center; color: #00FF64;">ANALYSIS COMPLETE</h3>
+                <div style="text-align: center; font-size: 13px; color: rgba(0,255,255,.7);">
+                    <div style="margin-bottom: 8px;"><strong>MISSION SCORE:</strong> 55/100</div>
+                    <div><strong>THREATS DETECTED:</strong> 5</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 20px;">THREAT MATRIX</h3>
+            <div id="threat-list"></div>
+
+            <div class="spacer"></div>
+
+            <button class="btn primary" onclick="show('s-practice')">🔧 COMPILE MISSION DATA</button>
+            <button class="btn" onclick="addThreat()" style="margin-top: 12px;">+ ADD GHOST THREAT</button>
+        </div>
+
+        <!-- SCREEN 4: PRACTICE SHEET -->
+        <div id="s-practice" class="screen">
+            <div class="topbar">✓ MISSION PACKAGE COMPILED</div>
+
+            <div class="success-banner">🎯 MISSION PACKAGE COMPILED — READY FOR DEBRIEF</div>
+
+            <div class="question-card">
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <div class="question-num">1</div>
+                    <div style="flex: 1;">
+                        <div class="question-text">What is <strong>24 ÷ 4</strong>?</div>
+                    </div>
+                </div>
+                <div class="section-label">CALCULATION FIELD</div>
+                <div class="calc-field">Show your work here...</div>
+                <input type="number" class="answer-input" placeholder="Answer">
+            </div>
+
+            <div class="question-card">
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <div class="question-num">2</div>
+                    <div style="flex: 1;">
+                        <div class="question-text">Solve: <strong>15 + 8</strong></div>
+                    </div>
+                </div>
+                <div class="section-label">CALCULATION FIELD</div>
+                <div class="calc-field">Show your work here...</div>
+                <input type="number" class="answer-input" placeholder="Answer">
+            </div>
+
+            <div class="question-card">
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <div class="question-num">3</div>
+                    <div style="flex: 1;">
+                        <div class="question-text">What is <strong>7 × 5</strong>?</div>
+                    </div>
+                </div>
+                <div class="section-label">CALCULATION FIELD</div>
+                <div class="calc-field">Show your work here...</div>
+                <input type="number" class="answer-input" placeholder="Answer">
+            </div>
+
+            <!-- PRINT SECTION -->
+            <div class="action-section cyan">
+                <h3 style="color: #00FFFF; margin-bottom: 12px;">📄 MATERIALIZE WORKSHEET</h3>
+                <p style="font-size: 12px; color: rgba(0,255,255,.6); margin-bottom: 12px;">Generates 8×11 printable sheet with calculation fields for Gabe to work on.</p>
+                <button class="btn" style="width: 100%; border-color: rgba(0,255,255,.6); background: rgba(0,200,255,.2); color: #FFFFFF;">🖨️ GENERATE PRINTABLE</button>
+            </div>
+
+            <!-- UPLOAD SECTION -->
+            <div class="action-section">
+                <h3 style="color: #00FFFF; margin-bottom: 12px;">📸 UPLOAD CADET'S WORK</h3>
+                <p style="font-size: 12px; color: rgba(0,255,255,.6); margin-bottom: 12px;">Beam Gabe's completed answers to Mission Computer for instant analysis.</p>
+                <div class="upload-zone" style="margin-bottom: 12px;">
+                    <div style="font-size: 24px;">📸</div>
+                    <div class="upload-zone-label">UPLOAD COMPLETED WORKSHEET</div>
+                </div>
+                <button class="btn primary">🚀 BEAM UP FILE</button>
+            </div>
+
+            <button class="btn primary mt" onclick="show('s-review')">▶ BEGIN MISSION DEBRIEF</button>
+        </div>
+
+        <!-- SCREEN 5: REVIEW SESSION -->
+        <div id="s-review" class="screen">
+            <div class="topbar">📊 MISSION DEBRIEF — LIVE</div>
+
+            <div class="progress-dots" id="progress-dots"></div>
+
+            <div class="objective-header">OBJECTIVE 3 OF 5 — 2 COMPLETE</div>
+
+            <!-- REVIEW CARD -->
+            <div class="review-card">
+                <h3>
+                    <span style="display: inline-flex; margin-right: 8px;">
+                        <div class="objective-badge">3</div>
+                    </span>
+                    OBJ-003: Solve <strong>24 ÷ 4</strong>
+                </h3>
+
+                <h3 style="margin-top: 16px;">📸 CADET'S TRANSMITTED WORK</h3>
+                <div class="cadet-work-box">
+                    <div style="text-align: center;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📄</div>
+                        <div style="font-size: 12px;">Holographic rendering of cadet's uploaded work</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 16px;">MISSION RESULT</h3>
+                <div class="mission-result">❌ OBJECTIVE FAILED</div>
+
+                <h3 style="margin-top: 16px;">🔑 MISSION COMPUTER SOLUTION</h3>
+                <div class="solution-steps">
+                    <strong>24 ÷ 4 = 6</strong><br><br>
+                    Step 1: Start with 24<br>
+                    Step 2: Divide by 4<br>
+                    Step 3: Each group has 6<br>
+                    Step 4: Answer = 6
+                </div>
+
+                <div class="hint-panel" style="margin-top: 16px;">
+                    💡 <strong>AI TACTICAL HINT:</strong> Gabe might benefit from reviewing division basics. Try using objects to show equal groups!
+                </div>
+
+                <div class="review-actions">
+                    <button class="btn green">✅ OBJECTIVE CLEARED +20⭐</button>
+                    <button class="btn amber">🔄 RETRY OBJECTIVE</button>
+                </div>
+            </div>
+
+            <button class="btn primary mt" onclick="show('s-celebrate')">➜ CONTINUE MISSION</button>
+        </div>
+
+        <!-- SCREEN 6: CELEBRATION -->
+        <div id="s-celebrate" class="screen">
+            <div class="flex-center" style="flex: 1;">
+                <div class="celebration-trophy">🏆</div>
+                <div class="celebration-title">🎆 ALL OBJECTIVES CLEARED<br>MISSION SUCCESS!</div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-value">5</span>
+                        <span class="stat-label">Objectives Cleared</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">100⭐</span>
+                        <span class="stat-label">Total Stars</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">8:42</span>
+                        <span class="stat-label">Mission Time</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">4 → 5</span>
+                        <span class="stat-label">Level Up!</span>
+                    </div>
+                </div>
+
+                <div class="promotion-badge">
+                    ⭐ PROMOTED ⭐<br>LEVEL 5 MISSION COMMANDER
+                </div>
+
+                <div class="prize-beacon">
+                    🎁 PRIZE BEACON ACTIVATED<br>
+                    Report to Auntie Mia for rewards!
+                </div>
+
+                <button class="btn primary" onclick="show('s-welcome')">🚀 NEW MISSION</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="version-badge">v2b — Hologram HUD</div>
+
+    <script>
+        function show(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+
+            // Initialize progress dots for review screen
+            if (screenId === 's-review') {
+                initProgressDots();
+            }
+
+            // Populate threat matrix for AI screen
+            if (screenId === 's-ai') {
+                populateThreatMatrix();
+            }
+        }
+
+        function initProgressDots() {
+            const container = document.getElementById('progress-dots');
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === 3 ? ' active' : '');
+                dot.textContent = i;
+                container.appendChild(dot);
+            }
+        }
+
+        function populateThreatMatrix() {
+            const threats = [
+                { num: '24 ÷ 4', text: 'Division of 24 by 4' },
+                { num: '15 + 8', text: 'Addition: 15 plus 8' },
+                { num: '7 × 5', text: 'Multiplication: 7 times 5' },
+                { num: '18 - 6', text: 'Subtraction: 18 minus 6' },
+                { num: '3 × 9', text: 'Multiplication: 3 times 9' }
+            ];
+
+            const list = document.getElementById('threat-list');
+            list.innerHTML = '';
+
+            threats.forEach((threat, idx) => {
+                const row = document.createElement('div');
+                row.className = 'threat-row';
+                row.innerHTML = `
+                    <div class="hexagon" style="width: 36px; height: 36px; font-size: 14px;">${idx + 1}</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 13px; color: #FFFFFF; font-weight: 500;">${threat.num}</div>
+                        <div style="font-size: 12px; color: rgba(0,255,255,.5);">${threat.text}</div>
+                    </div>
+                    <span class="threat-badge">THREAT</span>
+                    <div class="toggle active" onclick="event.stopPropagation(); this.classList.toggle('active');">
+                        <div class="toggle-dot"></div>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function addThreat() {
+            alert('Ghost Threat added to matrix!');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initProgressDots();
+            populateThreatMatrix();
+        });
+    </script>
+
+</body>
+</html>
